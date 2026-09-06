@@ -1,3 +1,5 @@
+<img width="774" height="377" alt="image" src="https://github.com/user-attachments/assets/21413ed3-6c91-45c9-a24b-84ff60eca351" />
+
 # Emoji art upscaler (HTML)
 This page is reserved only for expanding and testing out your own emoji ASCII art.
 
