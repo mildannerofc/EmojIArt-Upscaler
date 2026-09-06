@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upscaler de Arte Emoji</title>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --text-color: #e0e0e0;
+            --accent-color: #4caf50;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #fff;
+        }
+
+        .container {
+            background-color: var(--card-bg);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        .control-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        textarea {
+            width: 100%;
+            height: 120px;
+            background-color: #2a2a2a;
+            border: 1px solid #444;
+            color: #fff;
+            padding: 10px;
+            border-radius: 4px;
+            resize: vertical;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
+        input[type="number"] {
+            width: 80px;
+            padding: 8px;
+            background-color: #2a2a2a;
+            border: 1px solid #444;
+            color: #fff;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        button {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .output-container {
+            margin-top: 20px;
+            position: relative;
+        }
+
+        #output {
+            white-space: pre;
+            background-color: #2a2a2a;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 16px;
+            line-height: 1;
+            border: 1px dashed #666;
+        }
+
+        .copy-btn {
+            background-color: #008cba;
+            margin-top: 10px;
+        }
+
+        .copy-btn:hover {
+            background-color: #007ba7;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Pixel Art Emoji Upscaler</h1>
+    
+    <div class="container">
+        <div class="control-group">
+            <label for="inputArt">Cole sua arte de emojis aqui:</label>
+            <textarea id="inputArt" placeholder="Exemplo:&#10;🟥🟩&#10;🟦🟨"></textarea>
+        </div>
+
+        <div class="control-group">
+            <label for="scaleFactor">Fator de Redimensionamento (Aumento):</label>
+            <input type="number" id="scaleFactor" value="2" min="1" max="10">
+        </div>
+
+        <button onclick="upscaleEmojiArt()">Aumentar Tamanho</button>
+
+        <div class="output-container">
+            <label>Resultado:</label>
+            <div id="output">Sua arte ampliada aparecerá aqui...</div>
+            <button class="copy-btn" onclick="copyToClipboard()">Copiar Resultado</button>
+        </div>
+    </div>
+
+    <script>
+        // Lista extensa de emojis de blocos e variações comuns para validação/suporte
+        const emojiRegex = /[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F900}-\u{1F9FF}\u{1F1E6}-\u{1F1FF}\u{1F191}-\u{1F251}\u{1F004}\u{1F0CF}\u{1F170}-\u{1F171}\u{1F17E}-\u{1F17F}\u{1F18E}\u{3030}\u{2B50}\u{2B55}\u{2934}-\u{2935}\u{2B05}-\u{2B07}\u{23E9}-\u{23EC}\u{23F0}\u{23F3}\u{2194}-\u{2199}\u{21A9}-\u{21AA}\u{25AA}-\u{25AB}\u{25B6}\u{25C0}\u{25FB}-\u{25FE}]/gu;
+
+        function upscaleEmojiArt() {
+            const input = document.getElementById('inputArt').value;
+            const scale = parseInt(document.getElementById('scaleFactor').value) || 2;
+            const outputDiv = document.getElementById('output');
+
+            if (!input.trim()) {
+                outputDiv.innerText = "Por favor, insira alguma arte em emoji.";
+                return;
+            }
+
+            // Divide a entrada por linhas
+            const lines = input.split('\n');
+            let newArt = [];
+
+            lines.forEach(line => {
+                // Usa o Array.from para lidar corretamente com caracteres Unicode de emojis substitutos (surrogate pairs)
+                const characters = Array.from(line);
+                let upscaledLineTokens = [];
+
+                characters.forEach(char => {
+                    // Se for um espaço normal, mantém o espaço multiplicado pelo fator
+                    if (char === ' ' || char === '\t') {
+                        upscaledLineTokens.push(char.repeat(scale));
+                    } else {
+                        // Multiplica o emoji horizontalmente
+                        upscaledLineTokens.push(char.repeat(scale));
+                    }
+                });
+
+                const finalLine = upscaledLineTokens.join('');
+                
+                // Multiplica a linha verticalmente
+                for (let i = 0; i < scale; i++) {
+                    newArt.push(finalLine);
+                }
+            });
+
+            // Une as novas linhas expandidas
+            outputDiv.innerText = newArt.join('\n');
+        }
+
+        function copyToClipboard() {
+            const outputText = document.getElementById('output').innerText;
+            if (outputText && outputText !== "Sua arte ampliada aparecerá aqui..." && outputText !== "Por favor, insira alguma arte em emoji.") {
+                navigator.clipboard.writeText(outputText).then(() => {
+                    alert("Copiado para a área de transferência!");
+                }).catch(err => {
+                    alert("Erro ao copiar: " + err);
+                });
+            }
+        }
+    </script>
+</body>
+</html>
